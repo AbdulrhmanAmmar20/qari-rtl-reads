@@ -11,9 +11,11 @@ import { Button } from "@/components/ui/button";
 // import { mockBooks } from "@/data/mockData"; 
 import { Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { mockBooks } from "@/data/mockData";
 
-// Use the deployed URL for the books list
-const BOOKS_API_URL = "https://raqeem-34ac.onrender.com/books";
+// Determine backend URL from Vite env or default to localhost
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) || "http://localhost:4000";
+const BOOKS_API_URL = `${BACKEND_URL}/books`;
 
 interface AddBookModalProps {
   open: boolean;
@@ -53,7 +55,10 @@ const AddBookModal = ({ // Changed from export const
         setAllBooks(booksData);
       } catch (error) {
         console.error("Error fetching books:", error);
-        toast.error("فشل تحميل قائمة الكتب المتاحة.");
+        // Fallback to local mock data so the modal still works offline/local
+        console.warn("Falling back to local mockBooks due to fetch error.");
+        setAllBooks(mockBooks);
+        toast.error("فشل تحميل قائمة الكتب من الخادم — إظهار الكتب المحلية.");
       } finally {
         setIsLoading(false);
       }

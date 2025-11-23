@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { BookCard } from "@/components/BookCard";
 import { StudentAvatar } from "@/components/StudentAvatar";
 import { BookDetailsModal } from "@/components/BookDetailsModal";
-import { AddBookModal } from "@/components/AddBookModal";
+import AddBookModal from "@/components/AddBookModal";
 import { Leaderboard } from "@/components/Leaderboard";
 import { Plus, Library, Trophy, LogOut } from "lucide-react";
 import { mockBooks, mockReadingProgress } from "@/data/mockData";

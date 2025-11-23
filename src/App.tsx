@@ -13,22 +13,28 @@ const App = () => {
   const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
 
   const handleLogin = async (name: string, universityId: string) => {
-  try {
-    const response = await fetch(
-      `https://raqeem-34ac.onrender.com/login`,
-      {
+    try {
+      const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) || "http://localhost:4000";
+      const response = await fetch(`${BACKEND_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, universityId }),
+      });
+
+      if (!response.ok) {
+        let errMsg = "Login failed";
+        try {
+          const errData = await response.json();
+          errMsg = errData.error || JSON.stringify(errData);
+        } catch (e) {
+          // response was not JSON (likely an HTML error page), use text
+          const text = await response.text();
+          errMsg = text || errMsg;
+        }
+        throw new Error(errMsg);
       }
-    );
 
-    if (!response.ok) {
-      const errData = await response.json();
-      throw new Error(errData.error || "Login failed");
-    }
-
-    const backendUser = await response.json();
+      const backendUser = await response.json();
     const newStudent: Student = {
       id: backendUser.id,
       name: backendUser.name,

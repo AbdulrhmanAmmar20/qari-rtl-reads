@@ -20,7 +20,7 @@ app.get('/', (req, res) => res.send('Backend is running'));
 
 const file = path.join(__dirname, 'db.json');
 const adapter = new JSONFile(file);
-const defaultData = { users: [] };
+const defaultData = { users: [], books: [] };
 const db = new Low(adapter, defaultData);
 
 async function initDB() {
@@ -59,6 +59,12 @@ app.post('/login', async (req, res) => {
 app.get('/users', async (req, res) => {
   await db.read();
   res.json(db.data.users);
+});
+
+// Get all books
+app.get('/books', async (req, res) => {
+  await db.read();
+  res.json(db.data.books || []);
 });
 
 // Get single user
