@@ -15,7 +15,7 @@ const App = () => {
   const handleLogin = async (name: string, universityId: string) => {
     try {
       // Try to get user by ID first
-      let response = await fetch(`http://localhost:4000/users/${universityId}`);
+      let response = await fetch(`https://raqeem-34ac.onrender.com/users/${universityId}`);
       if (response.ok) {
         // User exists, use their data
         const backendUser = await response.json();
