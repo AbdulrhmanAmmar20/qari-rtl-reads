@@ -10,7 +10,7 @@ export const Leaderboard = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const res = await fetch("http://localhost:4000/users");
+        const res = await fetch("https://raqeem-34ac.onrender.com/users");
         if (res.ok) {
           const users = await res.json();
           // Calculate totalPagesRead for each user from progress.details
