@@ -13,42 +13,30 @@ const App = () => {
   const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
 
   const handleLogin = async (name: string, universityId: string) => {
-    try {
-      // Try to get user by ID first
-      let response = await fetch(`https://raqeem-34ac.onrender.com/users/${universityId}`);
-      if (response.ok) {
-        // User exists, use their data
-        const backendUser = await response.json();
-        const newStudent: Student = {
-          id: backendUser.id,
-          name: backendUser.name,
-          universityId: backendUser.id,
-          totalPagesRead: backendUser.progress?.booksRead || 0,
-          avatar: "/default-avatar.png",
-        };
-        setCurrentStudent(newStudent);
-        return;
-      }
-      // If not found, create new user
-      response = await fetch("http://localhost:4000/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, universityId }),
-      });
-      if (!response.ok) throw new Error("Failed to create user");
-      const backendUser = await response.json();
-      const newStudent: Student = {
-        id: backendUser.id,
-        name: backendUser.name,
-        universityId: backendUser.id,
-        totalPagesRead: backendUser.progress?.booksRead || 0,
-        avatar: "/default-avatar.png",
-      };
-      setCurrentStudent(newStudent);
-    } catch (error) {
-      alert("Login failed: " + (error as Error).message);
-    }
-  };
+  try {
+    // Call backend /login endpoint (auto-creates if new)
+    const response = await fetch("https://raqeem-34ac.onrender.com/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, universityId }),
+    });
+
+    if (!response.ok) throw new Error("Login failed");
+
+    const backendUser = await response.json();
+    const newStudent: Student = {
+      id: backendUser.id,
+      name: backendUser.name,
+      universityId: backendUser.id,
+      totalPagesRead: backendUser.progress?.booksRead || 0,
+      avatar: "/default-avatar.png",
+    };
+    setCurrentStudent(newStudent);
+  } catch (error) {
+    alert("Login failed: " + (error as Error).message);
+  }
+};
+
 
   const handleLogout = () => {
     setCurrentStudent(null);
