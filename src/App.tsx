@@ -38,15 +38,24 @@ const App = () => {
         throw new Error(errMsg);
       }
 
-      const backendUser = await response.json();
-    const newStudent: Student = {
-      id: backendUser.id,
-      name: backendUser.name,
-      universityId: backendUser.id,
-      totalPagesRead: backendUser.progress?.booksRead || 0,
-      avatar: "/default-avatar.png",
-    };
-    setCurrentStudent(newStudent);
+      // Parse response body safely: some servers may return empty body or non-JSON
+      let backendUser: any = null;
+      try {
+        const text = await response.text();
+        if (!text) throw new Error("Empty response from server");
+        backendUser = JSON.parse(text);
+      } catch (e) {
+        throw new Error("Invalid JSON response from server: " + (e as Error).message);
+      }
+
+      const newStudent: Student = {
+        id: backendUser.id,
+        name: backendUser.name,
+        universityId: backendUser.id,
+        totalPagesRead: backendUser.progress?.booksRead || 0,
+        avatar: "/default-avatar.png",
+      };
+      setCurrentStudent(newStudent);
   } catch (error) {
     alert("Login failed: " + (error as Error).message);
   }
