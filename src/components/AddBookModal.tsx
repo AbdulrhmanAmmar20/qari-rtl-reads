@@ -13,9 +13,12 @@ import { Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { mockBooks } from "@/data/mockData";
 
-// Determine backend URL from Vite env or default to localhost
-const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) || "http://localhost:4000";
-const BOOKS_API_URL = `${BACKEND_URL}/books`;
+// Determine backend URL from Vite env. In production default to same-origin
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) ||
+  (typeof window !== "undefined" && window.location.hostname === "localhost"
+    ? "http://localhost:4000"
+    : "");
+const BOOKS_API_URL = BACKEND_URL ? `${BACKEND_URL}/books` : `/books`;
 
 interface AddBookModalProps {
   open: boolean;

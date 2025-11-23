@@ -14,8 +14,12 @@ const App = () => {
 
   const handleLogin = async (name: string, universityId: string) => {
     try {
-      const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) || "http://localhost:4000";
-      const response = await fetch(`${BACKEND_URL}/login`, {
+      const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) ||
+        (typeof window !== "undefined" && window.location.hostname === "localhost"
+          ? "http://localhost:4000"
+          : "");
+      const loginUrl = BACKEND_URL ? `${BACKEND_URL}/login` : `/login`;
+      const response = await fetch(loginUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, universityId }),
