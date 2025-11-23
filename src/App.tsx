@@ -30,7 +30,7 @@ const App = () => {
         return;
       }
       // If not found, create new user
-      response = await fetch("http://localhost:4000/users", {
+      response = await fetch("https://raqeem-34ac.onrender.com/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, universityId }),
