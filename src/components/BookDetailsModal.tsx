@@ -38,7 +38,12 @@ export const BookDetailsModal = ({
     // Fetch all users from backend and filter those reading this book
     const fetchUsers = async () => {
       try {
-        const res = await fetch("https://raqeem-34ac.onrender.com/users");
+        const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) ||
+          (typeof window !== "undefined" && window.location.hostname === "localhost"
+            ? "http://localhost:4000"
+            : "");
+        const usersUrl = BACKEND_URL ? `${BACKEND_URL}/users` : `/users`;
+        const res = await fetch(usersUrl);
         if (res.ok) {
           const users = await res.json();
           const others = users

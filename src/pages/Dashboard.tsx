@@ -31,7 +31,12 @@ const Dashboard = ({ currentStudent, onLogout }: DashboardProps) => {
     // Fetch user progress from backend on mount
     const fetchProgress = async () => {
       try {
-        const res = await fetch(`https://raqeem-34ac.onrender.com/users/${currentStudent.id}`);
+        const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) ||
+          (typeof window !== "undefined" && window.location.hostname === "localhost"
+            ? "http://localhost:4000"
+            : "");
+        const userUrl = BACKEND_URL ? `${BACKEND_URL}/users/${currentStudent.id}` : `/users/${currentStudent.id}`;
+        const res = await fetch(userUrl);
         if (res.ok) {
           const user = await res.json();
           const details = user.progress?.details || {};
@@ -67,7 +72,12 @@ const Dashboard = ({ currentStudent, onLogout }: DashboardProps) => {
         };
         return acc;
       }, {} as Record<string, any>);
-      await fetch(`https://raqeem-34ac.onrender.com/users/${currentStudent.id}/progress`, {
+      const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) ||
+        (typeof window !== "undefined" && window.location.hostname === "localhost"
+          ? "http://localhost:4000"
+          : "");
+      const progressUrl = BACKEND_URL ? `${BACKEND_URL}/users/${currentStudent.id}/progress` : `/users/${currentStudent.id}/progress`;
+      await fetch(progressUrl, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -4,8 +4,12 @@ import { Student } from "@/types";
 import { Card } from "@/components/ui/card";
 import { Trophy, Medal, Award, User, Loader2 } from "lucide-react"; 
 
-// Use the deployed backend URL
-const API_URL = "https://raqeem-34ac.onrender.com/users"; 
+// Compute API URL from env or same-origin (production)
+const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) ||
+    (typeof window !== "undefined" && window.location.hostname === "localhost"
+        ? "http://localhost:4000"
+        : "");
+const API_URL = BACKEND_URL ? `${BACKEND_URL}/users` : `/users`;
 
 // --- START: StudentAvatar Component (Embedded to fix the original relative import error) ---
 // Define interface for props, relying on the imported 'Student' type
