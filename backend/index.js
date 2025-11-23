@@ -9,6 +9,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+// Serve static files (optional for avatar)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Root route to prevent 404
+app.get('/', (req, res) => res.send('Backend is running'));
+
+
+
 const file = path.join(__dirname, 'db.json');
 const adapter = new JSONFile(file);
 const defaultData = { users: [] };
@@ -24,6 +33,7 @@ initDB();
 
 // Create user
 // Login or auto-register
+// Login or auto-register
 app.post('/login', async (req, res) => {
   const { name, universityId } = req.body;
   if (!universityId) return res.status(400).json({ error: 'universityId is required' });
@@ -31,22 +41,17 @@ app.post('/login', async (req, res) => {
   await db.read();
   let user = db.data.users.find(u => u.id === universityId);
 
-  if (user) {
-    // User exists → return it
-    return res.json(user);
+  if (!user) {
+    user = {
+      id: universityId,
+      name: name || 'Anonymous',
+      progress: { booksRead: 0, lastRead: null, details: {} },
+    };
+    db.data.users.push(user);
+    await db.write();
   }
 
-  // User not found → create new
-  user = {
-    id: universityId,
-    name: name || 'Anonymous',
-    progress: { booksRead: 0, lastRead: null, details: {} }
-  };
-
-  db.data.users.push(user);
-  await db.write();
-
-  res.status(201).json(user);
+  res.json(user);
 });
 
 
@@ -102,4 +107,4 @@ app.delete('/users/:id', async (req, res) => {
 });
 
 const port = process.env.PORT || 4000;
-app.listen(port, () => console.log(`Backend running on http://localhost:${port}`));
+app.listen(port, () => console.log(`Backend running on port ${port}`));
