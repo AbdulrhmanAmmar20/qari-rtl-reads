@@ -23,22 +23,32 @@ async function initDB() {
 initDB();
 
 // Create user
-app.post('/users', async (req, res) => {
+// Login or auto-register
+app.post('/login', async (req, res) => {
   const { name, universityId } = req.body;
-  if (!name || !universityId) return res.status(400).json({ error: 'name and universityId are required' });
+  if (!universityId) return res.status(400).json({ error: 'universityId is required' });
+
   await db.read();
-  // Check if user already exists
   let user = db.data.users.find(u => u.id === universityId);
+
   if (user) {
-    // Do not allow duplicate
-    return res.status(409).json({ error: 'User with this ID already exists' });
+    // User exists → return it
+    return res.json(user);
   }
-  // Create new user
-  user = { id: universityId, name, progress: { booksRead: 0, lastRead: null, details: {} } };
+
+  // User not found → create new
+  user = {
+    id: universityId,
+    name: name || 'Anonymous',
+    progress: { booksRead: 0, lastRead: null, details: {} }
+  };
+
   db.data.users.push(user);
   await db.write();
+
   res.status(201).json(user);
 });
+
 
 // Get all users
 app.get('/users', async (req, res) => {
