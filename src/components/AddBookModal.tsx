@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Book } from "@/types";
 import {
   Dialog,
@@ -6,8 +7,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { mockBooks } from "@/data/mockData";
-import { Plus } from "lucide-react";
+// NOTE: We remove the dependency on mockBooks here and use the API instead.
+// import { mockBooks } from "@/data/mockData"; 
+import { Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+// Use the deployed URL for the books list
+const BOOKS_API_URL = "https://raqeem-34ac.onrender.com/books";
 
 interface AddBookModalProps {
   open: boolean;
@@ -16,13 +22,48 @@ interface AddBookModalProps {
   currentBookIds: string[];
 }
 
-export const AddBookModal = ({
+const AddBookModal = ({ // Changed from export const
   open,
   onClose,
   onAddBook,
   currentBookIds,
 }: AddBookModalProps) => {
-  const availableBooks = mockBooks.filter(
+  // State to hold the full list of books fetched from the backend
+  const [allBooks, setAllBooks] = useState<Book[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Effect to fetch books when the modal opens
+  useEffect(() => {
+    if (!open) {
+      // Clear data when closed for fresh fetch on next open
+      setAllBooks([]); 
+      return; 
+    }
+
+    const fetchBooks = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(BOOKS_API_URL);
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch available books from the server.");
+        }
+        
+        const booksData: Book[] = await response.json();
+        setAllBooks(booksData);
+      } catch (error) {
+        console.error("Error fetching books:", error);
+        toast.error("فشل تحميل قائمة الكتب المتاحة.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, [open]);
+
+  // Filter the fetched books to determine what is available to add
+  const availableBooks = allBooks.filter(
     (book) => !currentBookIds.includes(book.id)
   );
 
@@ -33,7 +74,12 @@ export const AddBookModal = ({
           <DialogTitle className="text-2xl font-bold">إضافة كتاب جديد</DialogTitle>
         </DialogHeader>
 
-        {availableBooks.length === 0 ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-16 text-primary space-y-2">
+            <Loader2 className="w-8 h-8 animate-spin" />
+            <p className="text-muted-foreground">جاري تحميل الكتب المتاحة...</p>
+          </div>
+        ) : availableBooks.length === 0 ? (
           <p className="text-center text-muted-foreground py-8">
             لقد أضفت جميع الكتب المتاحة!
           </p>
@@ -42,17 +88,21 @@ export const AddBookModal = ({
             {availableBooks.map((book) => (
               <div
                 key={book.id}
-                className="flex gap-4 p-4 rounded-lg border border-border hover:border-primary/50 transition-smooth bg-card"
+                className="flex gap-4 p-4 rounded-lg border border-border hover:border-primary/50 transition-smooth bg-card shadow-lg"
               >
                 <img
                   src={book.coverUrl}
                   alt={book.title}
-                  className="w-20 h-28 object-cover rounded-md shadow"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).onerror = null; 
+                    (e.target as HTMLImageElement).src = `https://placehold.co/80x112/A0A0A0/ffffff?text=Book+Cover`;
+                  }}
+                  className="w-20 h-28 object-cover rounded-md shadow-xl"
                 />
                 <div className="flex-1 space-y-2">
                   <div>
                     <h3 className="font-semibold line-clamp-1">{book.title}</h3>
-                    <p className="text-sm text-muted-foreground">{book.author}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-1">{book.author}</p>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {book.totalPages} صفحة • {book.genre}
@@ -63,7 +113,7 @@ export const AddBookModal = ({
                       onClose();
                     }}
                     size="sm"
-                    className="w-full gap-2"
+                    className="w-full gap-2 transition-all duration-300 hover:scale-[1.02]"
                   >
                     <Plus className="w-4 h-4" />
                     إضافة للمكتبة
@@ -77,3 +127,5 @@ export const AddBookModal = ({
     </Dialog>
   );
 };
+
+export default AddBookModal; // Added default export
