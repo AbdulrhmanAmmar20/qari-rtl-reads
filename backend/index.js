@@ -14,7 +14,14 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Root route to prevent 404
-app.get('/', (req, res) => res.send('Backend is running'));
+// Health route returns JSON (avoid HTML pages on API root)
+app.get('/', (req, res) => res.json({ status: 'ok', message: 'Backend is running' }));
+
+// Simple request logger for debugging (prints method, path and body)
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} - body:`, req.body || {});
+  next();
+});
 
 
 
@@ -36,6 +43,7 @@ initDB();
 // Login or auto-register
 app.post('/login', async (req, res) => {
   const { name, universityId } = req.body;
+  console.log('POST /login payload:', { name, universityId });
   if (!universityId) return res.status(400).json({ error: 'universityId is required' });
 
   await db.read();
@@ -51,7 +59,14 @@ app.post('/login', async (req, res) => {
     await db.write();
   }
 
+  console.log('POST /login returning user:', user);
+
   res.json(user);
+});
+
+// Return JSON 404 for any unmatched API routes (prevents HTML 404 pages)
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not Found' });
 });
 
 
