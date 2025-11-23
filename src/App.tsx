@@ -14,14 +14,19 @@ const App = () => {
 
   const handleLogin = async (name: string, universityId: string) => {
   try {
-    // Call backend /login endpoint (auto-creates if new)
-    const response = await fetch("https://raqeem-34ac.onrender.com/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, universityId }),
-    });
+    const response = await fetch(
+      `https://raqeem-34ac.onrender.com/login`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, universityId }),
+      }
+    );
 
-    if (!response.ok) throw new Error("Login failed");
+    if (!response.ok) {
+      const errData = await response.json();
+      throw new Error(errData.error || "Login failed");
+    }
 
     const backendUser = await response.json();
     const newStudent: Student = {
@@ -36,6 +41,7 @@ const App = () => {
     alert("Login failed: " + (error as Error).message);
   }
 };
+
 
 
   const handleLogout = () => {
