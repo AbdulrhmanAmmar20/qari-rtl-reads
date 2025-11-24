@@ -4,12 +4,20 @@
       "id": "0509124914",
       "name": "عبدالرحمن عمار",
       "progress": {
-        "booksRead": 1,
-        "lastRead": "2025-11-23T07:41:08.610Z",
+        "booksRead": 3,
+        "lastRead": "2025-11-23T20:25:09.444Z",
         "details": {
+          "3": {
+            "currentPage": 89,
+            "lastUpdated": "2025-11-23T20:25:09.444Z"
+          },
           "4": {
             "currentPage": 50,
             "lastUpdated": "2025-11-23T07:41:08.610Z"
+          },
+          "6": {
+            "currentPage": 70,
+            "lastUpdated": "2025-11-23T20:24:21.846Z"
           }
         }
       }
